@@ -6,7 +6,7 @@ import java.util.*;
 public class Application {
 
     //Лаботраторная работа по Эксертным системам (ЭС) #1
-    
+
 
     public static void main(String[] args) {
         Set<String> basicIngrediaents = new HashSet<>(Arrays.asList("Сахар", "Мука", "Мясо", "Овощи", "Фрукты", "Яйца", "Молоко"));
@@ -14,7 +14,7 @@ public class Application {
         Scanner sc = new Scanner(System.in);
 
         BiMap<Set<String>, String> lhmap = HashBiMap.create();
-        lhmap.put(new HashSet<>(Arrays.asList("яйца", "молоко")), "вареные яйца");
+        lhmap.put(new HashSet<>(Arrays.asList("яйца", "вода")), "вареные яйца");
 
         lhmap.put(new HashSet<>(Arrays.asList("яйца", "масло")), "яичница");
         lhmap.put(new HashSet<>(Arrays.asList("яйца", "мука")), "выпечка");
@@ -50,24 +50,30 @@ public class Application {
 
         Collections.reverse(listOfInput);
 
-        Stack<String> stack = new Stack<>();
+        Set<String> set = new HashSet<>();
 
-        for (String i: listOfInput) {
-            stack.push(i);
-        }
+        set.addAll(listOfInput);
 
         Set<String> tempSet = new HashSet<>();
 
-        while (stack.size() >= 1){
-            tempSet.add(stack.pop());
-            if (lhmap.get(tempSet) != null){
-                stack.push(lhmap.get(tempSet));
-                tempSet.clear();
+        boolean hasNewValues = true;
+        while (hasNewValues){
+            hasNewValues = false;
+            int oldSize = set.size();
+            lhmap.forEach((strings, s) -> {
+                if (set.containsAll(strings) && !set.contains(s)){
+                    set.add(s);
+                }
+            });
+            if (set.size() > oldSize){
+                hasNewValues = true;
             }
         }
 
+        set.removeAll(listOfInput);
+
         if (tempSet.size() != numberOfIngredients) {
-            System.out.println("Результат: " + Arrays.toString(tempSet.toArray()));
+            System.out.println("Результат: " + Arrays.toString(set.toArray()));
         } else {
             System.out.println("Из таких ингредиентов нельзя ничего изготовить!");
         }
@@ -77,28 +83,54 @@ public class Application {
         System.out.println("Какое блюдо разложить?: ");
 
         String dishName = sc.next();
+        Set<String> res = new HashSet<>();
+        res.add(dishName);
 
-        if(lhmap.inverse().get(dishName) != null) {
-            stack.clear();
-            tempSet.clear();
-            stack.push(dishName);
-            while (stack.size() != 0) {
-                String ingredient = stack.peek();
-                if (lhmap.inverse().get(ingredient) != null) {
-                    stack.pop();
-                    Set<String> loopSet = lhmap.inverse().get(ingredient);
-                    for (String stock : loopSet) {
-                        stack.push(stock);
-                    }
-                } else {
-                    tempSet.add(ingredient);
-                    stack.pop();
+        hasNewValues = true;
+
+        while (hasNewValues){
+            hasNewValues = false;
+            int oldSize = res.size();
+            lhmap.forEach((strings, s) -> {
+                if (res.contains(s)){
+                    res.addAll(strings);
                 }
-            }
+            });
 
-            System.out.println("Результат: " + Arrays.toString(tempSet.toArray()));
-        } else {
-            System.out.println("Такого блюда нет!");
+            if (oldSize != res.size()){
+                hasNewValues = true;
+            }
         }
+
+        res.remove(dishName);
+        System.out.println(res);
+//
+//        if(lhmap.inverse().get(dishName) != null) {
+//            lhmap.forEach((strings, s) -> {
+//
+//                    }
+//
+//            );
+//
+//            tempSet.clear();
+//            res.push(dishName);
+//            while (res.size() != 0) {
+//                String ingredient = res.peek();
+//                if (lhmap.inverse().get(ingredient) != null) {
+//                    res.pop();
+//                    Set<String> loopSet = lhmap.inverse().get(ingredient);
+//                    for (String stock : loopSet) {
+//                        res.push(stock);
+//                    }
+//                } else {
+//                    tempSet.add(ingredient);
+//                    res.pop();
+//                }
+//            }
+//
+//            System.out.println("Результат: " + Arrays.toString(tempSet.toArray()));
+//        } else {
+//            System.out.println("Такого блюда нет!");
+//        }
     }
 }
