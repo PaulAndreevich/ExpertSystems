@@ -172,13 +172,17 @@ public class Application {
         System.out.println("Искомый результат:");
         String resultDish = sc.next();
 
-        List<Set<String>> result = rec(initialIngredient, iteration, resultDish);
+        if (iteration != 0 && initialIngredient != null && !initialIngredient.isEmpty() && resultDish != null && !resultDish.isEmpty()){
+            List<Set<String>> result = rec(initialIngredient, iteration, resultDish);
 
-        if(!result.isEmpty()){
-            System.out.println("К вашему ингредиенту " + initialIngredient);
-            System.out.print("Ингредиенты: " + result);
+            if (!result.isEmpty()) {
+                System.out.println("К вашему ингредиенту " + initialIngredient);
+                System.out.print("Ингредиенты: " + result);
+            } else {
+                System.out.print("Ваше блюдо не найдено или количество переменных не соответствует рецепту");
+            }
         } else {
-            System.out.print("Ваше блюдо не найдено или количество переменных не соответствует рецепту");
+            System.out.print("Неверный ввод, пожалуйста повторите");
         }
 
     }
