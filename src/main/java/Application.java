@@ -2,20 +2,15 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Application {
 
-    //Лаботраторная работа по Эксертным системам (ЭС) #1
+    Set<String> basicIngrediaents = new HashSet<>(Arrays.asList("Сахар", "Мука", "Мясо", "Овощи", "Фрукты", "Яйца", "Молоко"));
+    public static BiMap<Set<String>, String> lhmap = HashBiMap.create();
 
-
-    public static void main(String[] args) {
-        Set<String> basicIngrediaents = new HashSet<>(Arrays.asList("Сахар", "Мука", "Мясо", "Овощи", "Фрукты", "Яйца", "Молоко"));
-
-        Scanner sc = new Scanner(System.in);
-
-        BiMap<Set<String>, String> lhmap = HashBiMap.create();
+    static {
         lhmap.put(new HashSet<>(Arrays.asList("яйца", "вода")), "вареные яйца");
-
         lhmap.put(new HashSet<>(Arrays.asList("яйца", "масло")), "яичница");
         lhmap.put(new HashSet<>(Arrays.asList("яйца", "мука")), "выпечка");
         lhmap.put(new HashSet<>(Arrays.asList("яйца", "молоко")), "омлет");
@@ -34,6 +29,18 @@ public class Application {
 
         lhmap.put(new HashSet<>(Arrays.asList("крем", "выпечка")), "пирожное");
         lhmap.put(new HashSet<>(Arrays.asList("крем", "выпечка", "фрукты")), "торт");
+
+        lhmap.put(new HashSet<>(Arrays.asList("торт", "шоколад")), "панчо");
+
+        lhmap.put(new HashSet<>(Arrays.asList("панчо", "манго")), "фернандо");
+    }
+
+
+    public static void Lab1(){
+        //Лаботраторная работа по Эксертным системам (ЭС) #1
+        Scanner sc = new Scanner(System.in);
+
+        BiMap<Set<String>, String> lhmap = HashBiMap.create();
 
         System.out.println("Сколько ингредиентов будете вводить? : ");
 
@@ -104,33 +111,80 @@ public class Application {
 
         res.remove(dishName);
         System.out.println(res);
-//
-//        if(lhmap.inverse().get(dishName) != null) {
-//            lhmap.forEach((strings, s) -> {
-//
-//                    }
-//
-//            );
-//
-//            tempSet.clear();
-//            res.push(dishName);
-//            while (res.size() != 0) {
-//                String ingredient = res.peek();
-//                if (lhmap.inverse().get(ingredient) != null) {
-//                    res.pop();
-//                    Set<String> loopSet = lhmap.inverse().get(ingredient);
-//                    for (String stock : loopSet) {
-//                        res.push(stock);
-//                    }
-//                } else {
-//                    tempSet.add(ingredient);
-//                    res.pop();
-//                }
-//            }
-//
-//            System.out.println("Результат: " + Arrays.toString(tempSet.toArray()));
-//        } else {
-//            System.out.println("Такого блюда нет!");
-//        }
+    }
+
+    private static Set<String> contains(String item) {
+        Set<String> res = new HashSet<>();
+        System.out.println(item + " ");
+        lhmap.keySet().forEach(k -> {
+            if(k.contains(item)) {
+                System.out.print(k.stream()
+                                    .filter(s -> !s.equals(item))
+                                    .collect(Collectors.toSet()));
+                res.addAll(k);
+                res.addAll(contains(lhmap.get(k)));
+            }
+        }
+        );
+        res.remove(item);
+        return res;
+    }
+
+    public static <T> Set<T> mergeSet(Set<T> a, Set<T> b)
+    {
+        return new HashSet<T>() {{
+            addAll(a);
+            addAll(b);
+        } };
+    }
+
+    private static List<Set<String>> rec(String ingredient, Integer iteration, String resultDish) {
+        List<Set<String>> res = new ArrayList<>();
+        for (BiMap.Entry<Set<String>, String> entry: lhmap.entrySet()) {
+            Set<String> key = entry.getKey();
+            String value = entry.getValue();
+            if(key.contains(ingredient) && (iteration - (key.size() - 1)) >= 0) {
+                if(value.equals(resultDish)){
+                    key.remove(ingredient);
+                    List<Set<String>> tempRes2 = new ArrayList<>();
+                    tempRes2.add(key);
+                    return tempRes2;
+                }
+                List<Set<String>> tempRes = rec(lhmap.get(key), iteration - 1, resultDish);
+                if (!tempRes.isEmpty()) {
+                    key.remove(ingredient);
+                    tempRes.forEach((strings -> strings.addAll(key)));
+                    res = tempRes;
+                    //System.out.print(res);
+                }
+            }
+        }
+        return res;
+    }
+    
+    public static void Lab2(){
+        //Лаботраторная работа по Эксертным системам (ЭС) #2
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Исходный ингредиент:");
+        String initialIngredient = sc.next();
+        System.out.println("Количество переменных:");
+        Integer iteration = sc.nextInt();
+        System.out.println("Искомый результат:");
+        String resultDish = sc.next();
+
+        List<Set<String>> result = rec(initialIngredient, iteration, resultDish);
+
+        if(!result.isEmpty()){
+            System.out.println("К вашему ингредиенту " + initialIngredient);
+            System.out.print("Ингредиенты: " + result);
+        } else {
+            System.out.print("Ваше блюдо не найдено или количество переменных не соответствует рецепту");
+        }
+
+    }
+
+    public static void main(String[] args) {
+        //Lab1();
+        Lab2();
     }
 }
