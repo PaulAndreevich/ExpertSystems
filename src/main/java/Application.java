@@ -7,13 +7,18 @@ import java.util.stream.Collectors;
 public class Application {
 
     Set<String> basicIngrediaents = new HashSet<>(Arrays.asList("Сахар", "Мука", "Мясо", "Овощи", "Фрукты", "Яйца", "Молоко"));
-    public static BiMap<Set<String>, String> lhmap = HashBiMap.create();
+    public static Map<Set<String>, String> lhmap = new HashMap<>();
 
     static {
         lhmap.put(new HashSet<>(Arrays.asList("яйца", "вода")), "вареные яйца");
         lhmap.put(new HashSet<>(Arrays.asList("яйца", "масло")), "яичница");
         lhmap.put(new HashSet<>(Arrays.asList("яйца", "мука")), "выпечка");
         lhmap.put(new HashSet<>(Arrays.asList("яйца", "молоко")), "омлет");
+        lhmap.put(new HashSet<>(Arrays.asList("сахар", "молоко")), "омлет");
+        lhmap.put(new HashSet<>(Arrays.asList("овес", "молоко")), "омлет");
+        lhmap.put(new HashSet<>(Arrays.asList("омлет", "молоко")), "омлет");
+
+
         lhmap.put(new HashSet<>(Arrays.asList("яйца", "сахар")), "крем");
         lhmap.put(new HashSet<>(Arrays.asList("яйца", "мясо")), "котлеты");
 
@@ -37,7 +42,7 @@ public class Application {
 
 
     public static void Lab1(){
-        //Лаботраторная работа по Эксертным системам (ЭС) #1
+        //Лаботраторная работа по Эксертным системам (ЭС) #2
         Scanner sc = new Scanner(System.in);
 
         BiMap<Set<String>, String> lhmap = HashBiMap.create();
@@ -155,7 +160,6 @@ public class Application {
                     key.remove(ingredient);
                     tempRes.forEach((strings -> strings.addAll(key)));
                     res = tempRes;
-                    //System.out.print(res);
                 }
             }
         }
@@ -164,6 +168,7 @@ public class Application {
     
     public static void Lab2(){
         //Лаботраторная работа по Эксертным системам (ЭС) #2
+        List<Set<String>> result = null;
         Scanner sc = new Scanner(System.in);
         System.out.println("Исходный ингредиент:");
         String initialIngredient = sc.next();
@@ -172,15 +177,27 @@ public class Application {
         System.out.println("Искомый результат:");
         String resultDish = sc.next();
 
+        System.out.print("Ингредиенты: ");
         if (iteration != 0 && initialIngredient != null && !initialIngredient.isEmpty() && resultDish != null && !resultDish.isEmpty()){
-            List<Set<String>> result = rec(initialIngredient, iteration, resultDish);
 
-            if (!result.isEmpty()) {
+            do {
+                if (result != null){
+                    lhmap.remove(result.get(0));
+                }
+                result = rec(initialIngredient, iteration, resultDish);
+                if (result.size() == 0){
+                    break;
+                }
+                System.out.print(result);
+                result.get(0).add(initialIngredient);
+            } while (lhmap.containsKey(result.get(0)));
+
+            /*if (!result.isEmpty()) {
                 System.out.println("К вашему ингредиенту " + initialIngredient);
                 System.out.print("Ингредиенты: " + result);
             } else {
                 System.out.print("Ваше блюдо не найдено или количество переменных не соответствует рецепту");
-            }
+            }*/
         } else {
             System.out.print("Неверный ввод, пожалуйста повторите");
         }
